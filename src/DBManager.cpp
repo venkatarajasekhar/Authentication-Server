@@ -1,6 +1,10 @@
 #include "DBManager.h"
+#include <string>
+#include <iostream>
 
-DBManager* DBManager::Pointer = 0;
+//using namespace std;
+
+DBManager* DBManager::Pointer = NULL;
 
 DBManager* DBManager::Instance()
 {
@@ -9,22 +13,56 @@ DBManager* DBManager::Instance()
 
 DBManager* DBManager::Create(const char* dbHost, unsigned int dbPort, const char* dbUser, const char* dbPass, const char* dbName)
 {
-	if (DBManager::Pointer == 0)
+	if (DBManager::Pointer == NULL)
 	{
-		DBManager::Pointer = new DBManager(dbHost, dbPort, dbUser, dbPass, dbName);
+		try{
+		DBManager::*Pointer = new DBManager(dbHost, dbPort, dbUser, dbPass, dbName);
+		}catch(std::bad_alloc& ba){
+                     std::cerr << "bad_alloc caught: ");
+		}
+		catch(...){
+		
+		}
 	}
-	return DBManager::Pointer;
+	return DBManager::*Pointer;
 }
 
 DBManager::DBManager(const char* dbHost, unsigned int dbPort, const char* dbUser, const char* dbPass, const char* dbName)
 {
+	try{
 	this->dbHost = std::string(dbHost);
+	}catch(...){
+	std::string::~dbHost;
+	}
+	try{
 	this->dbPort = dbPort;
+	}catch(...){
+	std::string::~dbPort;
+	}
+	try{
 	this->dbUser = std::string(dbUser);
+	}catch(...){
+	std::string::~dbUser;
+	}
+	try{
 	this->dbPass = std::string(dbPass);
+	}catch(...){
+	std::string::~dbPass;
+	}
+	try{
 	this->dbName = std::string(dbName);
+	}catch(...){
+	std::string::~dbName;
+	}
 
 	this->dbHandle = mysql_init(0);
+	}catch(...){
+	
+	
+	
+	
+	
+	}
 	MYSQL *dbHandleErr = dbHandle;
 	this->dbHandle = mysql_real_connect(dbHandle, this->dbHost.c_str(), this->dbUser.c_str(),
 										this->dbPass.c_str(), this->dbName.c_str(), this->dbPort, NULL, 0);
